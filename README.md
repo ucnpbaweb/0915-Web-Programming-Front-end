@@ -1,6 +1,5 @@
-# 0915-Web-Programming-Front-end
-0915 - Web-Programming Front End
-PBA Web Programming - 09-15 Autumn
+0915 - PBA Web Programming Fron End - 09-15 Autumn
+
 =================================
 
 In this repository you will find code examples and materials for the Web Programming course.
