@@ -1,4 +1,4 @@
-#0915 - PBA Web Programming Front End - 09-15 Autumn
+#PBA Web Programming Front End - 09-15 Autumn
 
 =================================
 
