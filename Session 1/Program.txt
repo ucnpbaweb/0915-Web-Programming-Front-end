@@ -1,0 +1,11 @@
+Program
+-------------------------
+
+Introduction
+Web Basics & HTML
+GIT Introduction (Quick Interlude)
+--Excercises
+HTML & HTML5
+--Excercises
+The Client Server Model & HTTP
+Exercises
