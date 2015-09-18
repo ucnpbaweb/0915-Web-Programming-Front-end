@@ -1,0 +1,143 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <style type="text/css">
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            height: 100%;
+        }
+
+        #area-info{
+            font-size:50px;
+            color:red;
+            z-index:999;
+            position: fixed;
+            top:10px;
+            left:10px;
+            width:200px;
+            height:100px;
+        }
+    </style>
+    <script type="text/javascript" src="jquery.js"></script>
+</head>
+<body>
+    <div id="area-info">
+
+    </div>
+    <div id="map"></div>
+    <div id="result"></div>
+
+    <script>
+        //styling the map
+        var myStyle = [{ "featureType": "landscape.natural", "elementType": "geometry.fill", "stylers": [{ "visibility": "on" }, { "color": "#e0efef" }] }, { "featureType": "poi", "elementType": "geometry.fill", "stylers": [{ "visibility": "on" }, { "hue": "#1900ff" }, { "color": "#c0e8e8" }] }, { "featureType": "road", "elementType": "geometry", "stylers": [{ "lightness": 100 }, { "visibility": "simplified" }] }, { "featureType": "road", "elementType": "labels", "stylers": [{ "visibility": "off" }] }, { "featureType": "transit.line", "elementType": "geometry", "stylers": [{ "visibility": "on" }, { "lightness": 700 }] }, { "featureType": "water", "elementType": "all", "stylers": [{ "color": "#7dcdcd" }] }];
+        //
+        var map;
+        var myLocation;
+        var coordinates = [];
+        var areainfo = document.getElementById("area-info");
+        function initMap() { //Init is called when maps API has loaded.. notice the callback method name in the script reference URL in the bottom
+            //set listners for polygons
+       
+
+
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: 0, lng: 0 },
+                zoom: 10, styles: myStyle
+            });
+
+            if (navigator && navigator.geolocation) {
+                // HTML5 GeoLocation
+                function getLocation(position) {
+                    myLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                    map.setCenter(myLocation, 12);
+                    var marker = new google.maps.Marker({ position: myLocation, map: map, title: 'You are here!' });
+                    //for custom markers or icons, look here : https://developers.google.com/maps/documentation/javascript/markers#simple_icons
+                }
+                navigator.geolocation.getCurrentPosition(getLocation); //Get current position is async, and takes a callback method
+
+
+            } else {
+                alert("Geolocation not available");
+            }
+
+
+            Geocode();
+
+        }
+
+
+
+        function Geocode() {
+            var queryString = [];
+            queryString.push("Lindholm Brygge");
+            queryString.push("Selma lagerlofsvej denmark");
+            queryString.push("Porthusgade denmark");
+            queryString.push("Sofiendalsvej 60");
+            console.log(queryString);
+            for (var i = 0; i < queryString.length; i++) {
+                doAjax(queryString[i]);
+            }
+
+            function doAjax(q) {
+                console.log(q);
+                $.ajax({
+                    method: "get",
+                    url: "https://maps.googleapis.com/maps/api/geocode/json?address=" + q + "&key=AIzaSyAJHBJOfMoD0vkGcAmCcVKg_TQjuyAwAAs",
+                    type: "json",
+                    success: function (data, y, z) {
+                        console.log(data);
+                        coordinates.push({ lat: data.results[0].geometry.location.lat, lng: data.results[0].geometry.location.lng });
+                        console.log(coordinates.length);
+                        if (coordinates.length == 4) {
+                            CreatePolygon(coordinates);
+                        }
+                    }, error: function (x, y) {
+                        console.log(x);
+                    }
+
+                });
+               
+            }
+
+            function CreatePolygon(coordinates) {
+                
+                var poly = new google.maps.Polygon({
+                    paths: coordinates,
+                    strokeColor: "#FF0000",
+                    strokeOpacity: 0.7,
+                    strokeWeight: 4,
+                    fillColor: "#00FF00",
+                    fillOpacity: 0.2
+
+                });
+                poly.setMap(map);
+                google.maps.event.addListener(poly, "mouseover", function () {
+                    this.setOptions({ fillColor: "#FF0000" });
+                    areainfo.innerText = google.maps.geometry.spherical.computeArea(poly.getPath()) + "kvm";
+                });
+
+                google.maps.event.addListener(poly, "mouseout", function () {
+                    this.setOptions({ fillColor: "#00FF00" });
+                    areainfo.innerText = "";
+                });
+
+                console.log();//Computes area in square meters (requires the geometry library)
+            }
+        }
+       
+
+    </script>
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?libraries=geometry&key=AIzaSyBTx7hCwRPH9fr7puDJT1M2HCM_loVCRdU&callback=initMap">
+    </script>
+
+</body>
+</html>
